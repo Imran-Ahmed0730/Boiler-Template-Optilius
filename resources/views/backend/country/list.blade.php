@@ -37,9 +37,9 @@
                         <div class="card-header d-flex align-items-center">
                             <h3 class="card-title mb-0">View Country</h3>
                             @can('Country Add')
-                            <a href="{{route('admin.country.create')}}" data-bs-toggle="tooltip" title="Add Country" class="btn btn-primary ms-auto">
-                                <i class="fa fa-plus me-2"></i> Add Country
-                            </a>
+                                <a href="{{route('admin.country.create')}}" data-bs-toggle="tooltip" title="Add Country" class="btn btn-primary ms-auto">
+                                    <i class="fa fa-plus me-2"></i> Add Country
+                                </a>
                             @endcan
                         </div>
                         <!-- /.card-header -->
@@ -69,19 +69,27 @@
                                         <td>1 {{$item->currency}} = {{$item->conversion_rate_to_tk}} TK</td>
                                         <td>{{$item->language}}</td>
                                         <td>
-                                            <span class="p-2 badge text-bg-{{$item->status == 1 ? 'success': 'danger'}}">{{$item->status == 1 ? 'Active':'Inactive'}}</span>
+                                            @can('Country Status Change')
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input toggle-switch" type="checkbox" role="switch"
+                                                           data-module="country" data-id="{{ $item->id }}"
+                                                        {{ $item->status == 1 ? 'checked' : '' }}>                                                <label class="form-check-label" for="status"></label>
+                                                </div>
+                                            @else
+                                                <span class="p-2 badge text-bg-{{$item->status == 1 ? 'success': 'danger'}}">{{$item->status == 1 ? 'Active':'Inactive'}}</span>
+                                            @endcan
                                         </td>
                                         <td>
                                             <div class="d-flex">
                                                 @can('Country Update')
-                                                <a href="{{route('admin.country.edit', $item->id)}}" title="Edit" class="btn btn-primary me-2"><i class="fa fa-pencil"></i></a>
+                                                    <a href="{{route('admin.country.edit', $item->id)}}" title="Edit" class="btn btn-primary me-2"><i class="fa fa-pencil"></i></a>
                                                 @endcan
                                                 @can('Country Delete')
-                                                <form action="{{route('admin.country.delete')}}" method="post">
-                                                    @csrf
-                                                    <input type="hidden" name="id" value="{{$item->id}}">
-                                                    <button class="btn btn-danger btn-delete" title="Remove"><i class="fa fa-trash"></i></button>
-                                                </form>
+                                                    <form action="{{route('admin.country.delete')}}" method="post">
+                                                        @csrf
+                                                        <input type="hidden" name="id" value="{{$item->id}}">
+                                                        <button class="btn btn-danger btn-delete" title="Remove"><i class="fa fa-trash"></i></button>
+                                                    </form>
                                                 @endcan
                                             </div>
                                         </td>

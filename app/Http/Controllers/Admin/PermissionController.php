@@ -17,6 +17,7 @@ class PermissionController extends Controller implements HasMiddleware
             new Middleware('permission:Permission View',only: ['index']),
             new Middleware('permission:Permission Update',only: ['edit']),
             new Middleware('permission:Permission Delete',only: ['destroy']),
+            new Middleware('permission:Permission Status Change',only: ['changeStatus']),
         ];
     }
     /**
@@ -90,5 +91,18 @@ class PermissionController extends Controller implements HasMiddleware
     {
         Permission::where('id', $request->id)->delete();
         return redirect()->route('admin.permission.index')->with('success', 'Permission deleted successfully');
+    }
+
+    public function changeStatus($id)
+    {
+        $permission = Permission::findOrFail($id);
+        $status = 1;
+        if($permission->status == 1){
+            $status = 0;
+        }
+        $permission->update([
+            'status' => $status,
+        ]);
+        return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
     }
 }

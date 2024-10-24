@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin\Page;
+use App\Models\Admin\Translation\PageTranslation;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -72,6 +73,7 @@ class PageController extends Controller implements HasMiddleware
     public function edit(string $slug)
     {
         $data['item'] = Page::where('slug', $slug)->firstOrFail();
+        $data['translations'] = PageTranslation::where('page_id', $data['item']->id)->get()->keyBy('lang_code');
         return view('backend.page.form', $data);
     }
 
@@ -98,6 +100,27 @@ class PageController extends Controller implements HasMiddleware
             'content'   => $request->description,
             'status'    => $request->status
         ]);
+
+        foreach (json_decode(getSetting('site_language')) as $language){
+            $translation = PageTranslation::where('page_id', $page->id)->where('lang_code', $language)->first();
+            $description = 'description_' . $language;
+            if($translation){
+                $translation->update([
+                    'page_id'=> $page->id,
+                    'lang_code' => $language,
+                    'description' => $request->$description == null ? $request->description: $request->$description,
+                ]);
+            }
+            else{
+                PageTranslation::create([
+                    'page_id'=> $page->id,
+                    'lang_code' => $language,
+                    'description' => $request->$description == null ? $request->description: $request->$description,
+                ]);
+            }
+
+
+        }
 
         return redirect()->route('admin.page.index')->with('success', 'Page updated successfully');
     }

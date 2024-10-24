@@ -54,13 +54,27 @@
                     <div class="col-md-12"> <!--begin::Quick Example-->
                         <div class="card card-primary card-outline mb-4"> <!--begin::Header-->
                             <div class="card-header">
-                                <div class="card-title d-flex">Physical Store Information</div>
+                                <div class="card-title d-flex">Site Language Information</div>
                             </div> <!--end::Header--> <!--begin::Form-->
 
                             <div class="card-body" id="shop-container">
                                 <div class="mb-3">
+                                    <label for="default_language" class="form-label">Default Language</label>
+                                    <select name="default_language" class="js-example-basic-multiple form-control" id="default_language" required>
+                                        <option value="">Select</option>
+                                        @foreach($languages as $language)
+                                            <option value="{{$language->lang_code}}" {{getSetting('default_language') == $language->lang_code ? 'selected':''}}>{{$language->language}}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('default_language')
+                                    <div class="invalid-feedback" role="alert">
+                                        {{$message}}
+                                    </div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3">
                                     <label for="site_language" class="form-label">Languages To Be Translated</label>
-                                    <select name="site_language[]" class="js-example-basic-multiple form-control" id="" multiple required>
+                                    <select name="site_language[]" class="js-example-basic-multiple form-control" id="" multiple>
                                         <option value="">Select</option>
                                         @foreach($languages as $language)
                                             @if(getSetting('site_language') != null && !in_array($language->lang_code, json_decode(getSetting('site_language'))))

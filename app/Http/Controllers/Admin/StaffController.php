@@ -20,6 +20,7 @@ class StaffController extends Controller implements HasMiddleware
            new Middleware('permission:Staff View', only: ['index']),
            new Middleware('permission:Staff Update', only: ['edit']),
            new Middleware('permission:Staff Delete', only: ['destroy']),
+           new Middleware('permission:Staff Status Change', only: ['changeStatus']),
        ];
     }
     /**
@@ -201,5 +202,18 @@ class StaffController extends Controller implements HasMiddleware
         User::destroy($staff->user_id);
         $staff->delete();
         return back()->with('success', 'Staff deleted successfully.');
+    }
+
+    public function changeStatus($id)
+    {
+        $staff = Staff::findOrFail($id);
+        $status = 1;
+        if($staff->status == 1){
+            $status = 0;
+        }
+        $staff->update([
+            'status' => $status,
+        ]);
+        return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
     }
 }

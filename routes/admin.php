@@ -79,6 +79,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::controller(PermissionController::class)->prefix('permission')->name('permission.')->group(function () {
             Route::post('/update',  'update')->name('update');
             Route::post('/delete',  'destroy')->name('delete');
+            Route::get('/status/change/{id}',  'changeStatus')->name('status.change');
         });
 
         //staff module
@@ -87,6 +88,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::controller(StaffController::class)->group(function () {
                 Route::post('/update','update')->name('update');
                 Route::post('/delete','destroy')->name('delete');
+                Route::get('/status/change/{id}',  'changeStatus')->name('status.change');
             });
             Route::controller(DashboardController::class)->group(function () {
                 Route::get('/role/assign', 'roleAssign')->name('assign');
@@ -125,6 +127,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::controller(CountryController::class)->prefix('country')->name('country.')->group(function () {
             Route::post('/update',  'update')->name('update');
             Route::post('/delete',  'destroy')->name('delete');
+            Route::get('/status/change/{id}',  'changeStatus')->name('status.change');
         });
 
         //frontend page module

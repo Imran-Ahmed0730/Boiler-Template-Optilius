@@ -18,6 +18,7 @@ class CountryController extends Controller implements HasMiddleware
             new Middleware('permission:Country View', only: ['index']),
             new Middleware('permission:Country Update', only: ['edit']),
             new Middleware('permission:Country Delete', only: ['destroy']),
+            new Middleware('permission:Country Status Change', only: ['changeStatus']),
         ];
     }
     /**
@@ -54,8 +55,8 @@ class CountryController extends Controller implements HasMiddleware
             'lang_code' => 'required',
             'conversion_rate_to_tk' => 'required',
         ],[
-        'iso2.unique' => 'Country code already exist.',
-            ]);
+            'iso2.unique' => 'Country code already exist.',
+        ]);
 //        dd('ok');
         $request->merge([
             'iso2' => Str::title($request->iso2)
@@ -128,5 +129,18 @@ class CountryController extends Controller implements HasMiddleware
     {
         Country::destroy($request->id);
         return redirect()->route('admin.country.index')->with('success', 'Country deleted successfully.');
+    }
+
+    public function changeStatus($id)
+    {
+        $country = Country::findOrFail($id);
+        $status = 1;
+        if($country->status == 1){
+            $status = 0;
+        }
+        $country->update([
+            'status' => $status,
+        ]);
+        return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
     }
 }

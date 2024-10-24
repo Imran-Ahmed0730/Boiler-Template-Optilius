@@ -25,7 +25,7 @@ class StaticTranslationController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $data['items'] = StaticTranslation::where('lang_code', 'en')->get();
+        $data['items'] = StaticTranslation::where('lang_code', getSetting('default_language'))->get();
 //        $data['items'] = StaticTranslation::all()->groupBy('key');
 //        return $data;
         return view('backend.translation.index', $data);
@@ -45,11 +45,20 @@ class StaticTranslationController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
+        $default_language = getSetting('default_language');
+        $default_lang_value = 'value_'.$default_language;
         $request->validate([
             'key' => 'required|unique:static_translations,key',
-            'value_en' => 'required',
+            $default_lang_value => 'required',
             'page' => 'required',
         ]);
+
+        $translation = StaticTranslation::create([
+            'key'=> $request->key,
+            'lang_code' => $default_language,
+            'value' => $request->$default_lang_value,
+        ]);
+
         foreach (json_decode(getSetting('site_language')) as $language){
 
             $value = 'value_' . $language;
@@ -103,20 +112,45 @@ class StaticTranslationController extends Controller implements HasMiddleware
      */
     public function update(Request $request)
     {
-//        return $request;
+        $default_language = getSetting('default_language');
+        $default_lang_value = 'value_'.$default_language;
         $request->validate([
-            'value_en' => 'required',
+            $default_lang_value => 'required',
             'page' => 'required',
         ]);
-        $translations = [];
-        $key_translations = StaticTranslation::where('key', $request->key)->get();
-        foreach ($key_translations as $key_translation){
 
-            $value = 'value_' . $key_translation->lang_code;
-            $key_translation->update([
+        $key_default_translation = StaticTranslation::where('key', $request->key)->where('lang_code', $default_language)->first();
+        if($key_default_translation != null){
+            $value = 'value_' . $key_default_translation->lang_code;
+            $key_default_translation->update([
                 'value' => $request->$value == null ? $request->value_en: $request->$value,
             ]);
-            array_push($translations, $key_translation->id);
+        }
+        else{
+            $value = 'value_' . $default_language;
+            $key_default_translation = StaticTranslation::create([
+                'key' => $request->key,
+                'lang_code' => $default_language,
+                'value' => $request->$value == null ? $request->value_en: $request->$value,
+            ]);
+        }
+
+        foreach (json_decode(getSetting('site_language')) as $language){
+            $key_translation = StaticTranslation::where('key', $request->key)->where('lang_code', $language)->first();
+            if($key_translation != null){
+                $value = 'value_' . $key_translation->lang_code;
+                $key_translation->update([
+                    'value' => $request->$value == null ? $request->value_en: $request->$value,
+                ]);
+            }
+            else{
+                $value = 'value_' . $language;
+                $key_translation = StaticTranslation::create([
+                    'key' => $request->key,
+                    'lang_code' => $language,
+                    'value' => $request->$value == null ? $request->value_en: $request->$value,
+                ]);
+            }
         }
 
         foreach (FrontendPage::all() as $page){

@@ -35,9 +35,9 @@
                         <div class="card-header d-flex align-items-center">
                             <h3 class="card-title mb-0">View Permissions</h3>
                             @can('Permission Add')
-                            <a href="{{route('admin.permission.create')}}" data-bs-toggle="tooltip" title="Add Permission" class="btn btn-primary ms-auto">
-                                <i class="fa fa-plus me-2"></i> Add Permission
-                            </a>
+                                <a href="{{route('admin.permission.create')}}" data-bs-toggle="tooltip" title="Add Permission" class="btn btn-primary ms-auto">
+                                    <i class="fa fa-plus me-2"></i> Add Permission
+                                </a>
                             @endcan
                         </div>
                         <!-- /.card-header -->
@@ -56,18 +56,28 @@
                                     <tr class="align-middle">
                                         <td>{{$key+1}}.</td>
                                         <td>{{Str::title($item->name)}}</td>
-                                        <td><span class="p-2 badge text-bg-{{$item->status == 1 ? 'success': 'danger'}}">{{$item->status == 1 ? 'Showed':'Hidden'}}</span></td>
+                                        <td>
+                                            @can('Permission Status Change')
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input toggle-switch" type="checkbox" role="switch"
+                                                           data-module="permission" data-id="{{ $item->id }}"
+                                                        {{ $item->status == 1 ? 'checked' : '' }}>                                                <label class="form-check-label" for="status"></label>
+                                                </div>
+                                            @else
+                                                <span class="p-2 badge text-bg-{{$item->status == 1 ? 'success': 'danger'}}">{{$item->status == 1 ? 'Showed':'Hidden'}}</span>
+                                            @endcan
+                                        </td>
                                         <td>
                                             <div class="d-flex">
                                                 @can('Permission Update')
-                                                <a href="{{route('admin.permission.edit', $item->id)}}" class="btn btn-primary me-2"><i class="fa fa-pencil"></i></a>
+                                                    <a href="{{route('admin.permission.edit', $item->id)}}" class="btn btn-primary me-2"><i class="fa fa-pencil"></i></a>
                                                 @endcan
                                                 @can('Permission Delete')
-                                                <form action="{{route('admin.permission.delete')}}" method="post">
-                                                    @csrf
-                                                    <input type="hidden" name="id" value="{{$item->id}}">
-                                                    <button class="btn btn-danger btn-delete"><i class="fa fa-trash"></i></button>
-                                                </form>
+                                                    <form action="{{route('admin.permission.delete')}}" method="post">
+                                                        @csrf
+                                                        <input type="hidden" name="id" value="{{$item->id}}">
+                                                        <button class="btn btn-danger btn-delete"><i class="fa fa-trash"></i></button>
+                                                    </form>
                                                 @endcan
                                             </div>
                                         </td>
